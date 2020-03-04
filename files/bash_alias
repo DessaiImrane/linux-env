@@ -1,0 +1,6 @@
+alias ls="ls --color=auto -lh"
+alias la="ls -a"
+alias lr="ls -R"
+alias lra="la -R"
+alias emacs="emacs -fs"
+alias xpdf="xpdf -fullscreen -z width"

@@ -1,0 +1,224 @@
+;;######################################
+;; Chargement de fichiers
+
+;;inclusion des fonctions personnelles
+
+(defvar dir "~/.emacs_$USER" "chemin des fichiers personnalisés")
+(setq load-path (cons dir load-path))
+
+(load-library "fonctions")
+(load-library "hideshow")
+(load-library "latex")
+(load-library "shell")
+
+;;######################################
+;; Mode par défaut
+
+;; Encodage
+(set-keyboard-coding-system 'utf-8)
+(set-language-environment 'UTF-8)
+
+;; hs-minor-mode pour les modes suivants
+;; pas de hs pour le CSS
+(add-hook 'emacs-lisp-mode-hook
+	  (lambda () (hs-minor-mode t)))
+(add-hook 'c-mode-hook
+	  (lambda () (hs-minor-mode t)))
+(add-hook 'java-mode-hook
+	  (lambda () (hs-minor-mode t)))
+(add-hook 'php-mode-hook
+	  (lambda () (hs-minor-mode t)))
+(add-hook 'javascript-mode-hook
+	  (lambda () (hs-minor-mode t)))
+(add-hook 'html-mode-hook
+	  (lambda () (hs-minor-mode t)))
+(add-hook 'nxml-mode-hook
+	  (lambda () (hs-minor-mode t)))
+
+;; le curseur ne clignote plus
+(blink-cursor-mode nil)
+
+;; Couper le bip
+(setq visible-bell t)
+
+;; la molette de la souris
+(mouse-wheel-mode t)
+
+;; on enleve la barre hideuse de emacs 21
+(tool-bar-mode nil)
+
+;; montre les parenthèses
+(require 'paren)
+(show-paren-mode t)
+					;(setq blink-matching-paren t)
+					;(setq blink-matching-paren-on-screen t)
+					;(setq show-paren-style 'expression)
+					;(setq blink-matching-paren-dont-ignore-comments t)
+
+;; le numero de la ligne et de la colone
+(setq line-number-mode t)
+(setq column-number-mode t)
+
+;; on démarre en mode text (buffer scratch)
+(setq initial-major-mode 'text-mode)
+
+;; la langue du dictionnaire
+(require 'ispell)
+(setq ispell-dictionary "francais")
+
+;; la completion respecte la casse
+(setq dabbrev-case-replace nil)
+
+;; Inhiber l'affichage du message d'accueil
+(setq inhibit-startup-message t)
+(setq inhibit-startup-echo-area-message t)
+(setq initial-scratch-message nil) 
+
+;; Remplacer les question "yes or no" par "y or n"
+(fset 'yes-or-no-p 'y-or-n-p)
+
+;; colle avec la souris là où se trouve le curseur et non là où on a cliqué
+(setq mouse-yank-at-point nil)
+					;(setq mouse-yank-at-click nil)
+
+;; gestion des selections
+(if window-system
+    ;; sous X
+    (progn
+      ;; pas de re-définition intempestive de certaines touches après pc-selection-mode
+      (setq pc-select-selection-keys-only t)
+      ;; sélection avec shift
+      (pc-selection-mode))
+    ;; à la console
+    (progn
+      (setq highlight-nonselected-windows nil)
+      (setq transient-mark-mode t)
+      (setq mark-even-if-inactive t)
+      (delete-selection-mode 1))
+    )
+
+;; Affichage non-tronqué des longues lignes
+(setq truncate-lines nil)
+(setq truncate-partial-width-windows nil)
+
+;; Supprimer les fichiers de sauvegarde en quittant
+(setq make-backup-files nil)
+(setq delete-auto-save-files t)
+
+
+;; Couleur par défaut
+;; Colorisation syntaxique maximale dans tous les modes
+(require 'font-lock)
+(global-font-lock-mode t)
+(setq font-lock-maximum-decoration t)
+(set-foreground-color "white")
+(set-background-color "black")
+
+
+;;######################################
+;; Section raccourcis clavier
+
+;; Que delete face bien un delete
+(global-set-key [delete]     'delete-char)
+
+;; F1 et F2 : defilement des buffers
+(global-set-key [f1]  'yic-next-buffer)
+(global-set-key [f2]  'yic-prev-buffer)
+
+;; F3 : coupe le buffer en 2 verticalement
+(global-set-key [\C-f3]     'delete-other-windows)
+
+;; F3 : coupe le buffer en 2 horizontalement
+(global-set-key [f3]  'split-window-horizontally)
+
+;; F4 : tue le buffer courant
+(global-set-key [f4]    'kill-this-buffer)
+(global-set-key [\C-f4]     'switch-to-buffer)
+
+;;F5 : Aller à láutre fentre 
+(global-set-key [f5]    'other-window)
+
+;; F6 : commente la ligne courante  suivant le mode choisi (C++,C,...)
+					;(global-set-key [f6]     'comment-region)
+					;(global-set-key [\C-f6]  'uncomment-region)
+(global-set-key [f6] 'comment-line)
+(global-set-key [\C-f6] 'uncomment-line)
+
+;; F7 : lance ispell
+(global-set-key [f7]     'ispell-buffer)
+(global-set-key [\C-f7]  'ispell-word)
+(global-set-key [\M-f7]  'ispell-region)
+
+
+;; F8 : indente correctement tout le buffer courant
+(global-set-key [f8]     'vectra-indent-hilit-buffer) 
+
+;; F9 : lance l'iso accent mode
+(global-set-key [f9] 'iso-accents-mode)
+
+;; F10 : le go to line
+(global-set-key [f10]      'goto-line)
+
+;; F11 et F12 : montre ou cache les blocs de code
+(global-set-key [f11] 'hs-hide-block)
+(global-set-key [f12] 'hs-show-block)
+(global-set-key [\C-f11] 'hs-hide-all)
+(global-set-key [\C-f12] 'hs-show-all)
+
+;; Lance le query replace
+(global-set-key "\C-q" 'query-replace)
+
+
+;;######################################
+;; Fichiers des modes
+
+;; pour LaTeX
+(setq auto-mode-alist (cons '("\\.tex\\'" . latex-mode) auto-mode-alist))
+(setq latex-mode-hook
+      (lambda ()
+	(define-key latex-mode-map "\M-i" 'latex_tpl_item)
+	(define-key latex-mode-map "\M-t" 'latex_tpl_tab)
+	(define-key latex-mode-map "\M-h" 'latex_tpl_href)
+	(define-key latex-mode-map "\M-V" (lambda () (interactive) (latex_tpl_block "verbatim")))
+	(define-key latex-mode-map "\M-C" (lambda () (interactive) (latex_tpl_block "center")))
+	(define-key latex-mode-map "\M-F" (lambda () (interactive) (latex_tpl_block "frame")))
+	(define-key latex-mode-map "\M-p" (lambda () (interactive) (latex_tpl_cmd "part")))
+	(define-key latex-mode-map "\M-c" (lambda () (interactive) (latex_tpl_cmd "chapter")))
+	(define-key latex-mode-map "\M-s" (lambda () (interactive) (latex_tpl_cmd "section")))
+	(define-key latex-mode-map "\M-b" (lambda () (interactive) (latex_tpl_cmd "subsection")))
+	(define-key latex-mode-map "\M-e" (lambda () (interactive) (latex_tpl_cmd "emph")))
+	)
+      )
+
+
+;; pour Shell
+(setq auto-mode-alist (cons '("\\.sh\\'" . sh-mode) auto-mode-alist))
+(setq sh-mode-hook
+      (lambda ()
+	(define-key sh-mode-map "\M-f" 'shell_for)
+	(define-key sh-mode-map "\M-i" 'shell_if)
+	(define-key sh-mode-map "\M-w" 'shell_while)
+	(define-key sh-mode-map "\M-c" 'shell_case)
+	(define-key sh-mode-map "\M-I" 'shell_save_ifs)
+	(define-key sh-mode-map "\M-P" 'shell_save_pwd)
+	)
+      )
+
+
+;; pour LISP
+(load-library "cl")
+(setq lisp-indent-function 'common-lisp-indent-function)
+(put 'with-slots 'lisp-indent-function 2)
+
+
+;; pour JavaScript
+(setq auto-mode-alist (cons '("\\.js\\'" . javascript-mode) auto-mode-alist))
+(autoload 'javascript-mode "javascript" nil t)
+
+;; pour CSS
+(setq auto-mode-alist (cons '("\\.css\\'" . css-mode) auto-mode-alist))
+(autoload 'css-mode "css-mode" nil t) 
+
+;; pour PHP
+(setq auto-mode-alist (cons '("\\.php\\'" . php-mode) auto-mode-alist))
+(autoload 'php-mode "php-mode" nil t) 
